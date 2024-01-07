@@ -107,14 +107,34 @@ func indexHandler(c *gin.Context) {
 	})
 }
 
+func deleteTempFile(tmp_file_name string) {
+	os.Remove(tmp_file_name)
+}
+
+func deletTempFileHandler(c *gin.Context) {
+	tmp_file_name := c.Query("filename")
+	temp_file_name_decoded, err := url.QueryUnescape(tmp_file_name)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+	}
+	deleteTempFile(temp_file_name_decoded)
+	c.JSON(http.StatusOK, gin.H{
+		"filename": temp_file_name_decoded,
+	})
+}
+
 func main() {
 	log.Println("start server")
 	router := gin.Default()
 	v1 := router.Group("/api/v1")
 	{
 		v1.GET("/filter", getTodo)
-		v1.POST("/upload", uploadTempFile)
+		v1.POST("/upload", AuthToken(), uploadTempFile)
+		v1.DELETE("/delete", AuthToken(), deletTempFileHandler)
 	}
+
 	router.Run(":8080")
 	log.Println("end server")
 }

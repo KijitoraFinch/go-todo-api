@@ -1,4 +1,5 @@
 import requests
+import os
 
 class TodoAPI:
     BASE_URL = 'http://localhost:8080/api/v1'
@@ -18,9 +19,12 @@ class TodoAPI:
 
     @staticmethod
     def post_todo():
+        #headers = {'Authorization': f'Bearer {os.getenv("TOKEN")}'}
+
+        headers = {'Authorization': 'Bearer test'}
         with open('test.txt', 'rb') as file:
             files = {'file': file}
-            response = requests.post(f'{TodoAPI.BASE_URL}/upload', files=files)
+            response = requests.post(f'{TodoAPI.BASE_URL}/upload', files=files, headers=headers)
         return response.json()
 
 if __name__ == "__main__":
